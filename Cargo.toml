@@ -1,0 +1,8 @@
+[package]
+name = "rust-cuckoofilter"
+version = "0.1.0"
+authors = ["Rui Guo <rguo@leancloud.rocks>"]
+
+[dependencies]
+rand = "0.3"
+siphasher = "^0.2.2"
