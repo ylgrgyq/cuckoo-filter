@@ -46,6 +46,20 @@ impl CuckooFilter {
         }
     }
 
+    pub fn with_bucket_size(size: usize) -> CuckooFilter {
+        CuckooFilter {
+            hash_fn: CuckooFilter::sip_new(),
+            size: 0,
+            capacity: size as usize * ENTRIES_PER_BUCKET,
+            max_num_kicks: MAX_NUM_KICKS,
+            buckets:
+            repeat(Bucket::new())
+                .take(size as usize)
+                .collect::<Vec<_>>()
+                .into_boxed_slice()
+        }
+    }
+
     pub fn insert<T>(&mut self, item: &T) -> Result<bool, &str>
         where T: Hash {
         let mut fp = FingerPrint::gen_finger_print(item, &self.hash_fn);
@@ -153,21 +167,21 @@ impl CuckooFilter {
 fn test_insert_lookup_delete() {
     let mut f = CuckooFilter::new();
     let test_str = &String::from("Haha");
-    assert!(!f.lookup(test_str));
-    assert!(f.insert(test_str).unwrap_or(false));
+    assert!(f.lookup(test_str) == false);
+    assert!(f.insert(test_str).unwrap_or(false) == true);
     assert_eq!(f.get_size(), 1);
-    assert!(f.lookup(test_str));
-    assert!(f.insert(test_str).unwrap_or(false));
-    assert!(f.insert(test_str).unwrap_or(false));
+    assert!(f.lookup(test_str) == true);
+    assert!(f.insert(test_str).unwrap_or(false) == true);
+    assert!(f.insert(test_str).unwrap_or(false) == true);
     assert_eq!(f.get_size(), 3);
-    assert!(f.lookup(test_str));
-    assert!(f.delete(test_str));
+    assert!(f.lookup(test_str) == true);
+    assert!(f.delete(test_str) == true);
     assert_eq!(f.get_size(), 2);
-    assert!(f.lookup(test_str));
-    assert!(f.delete(test_str));
+    assert!(f.lookup(test_str) == true);
+    assert!(f.delete(test_str) == true);
     assert_eq!(f.get_size(), 1);
-    assert!(f.lookup(test_str));
-    assert!(f.delete(test_str));
+    assert!(f.lookup(test_str) == true);
+    assert!(f.delete(test_str) == true);
     assert_eq!(f.get_size(), 0);
-    assert!(!f.lookup(test_str));
+    assert!(f.lookup(test_str) == false);
 }
