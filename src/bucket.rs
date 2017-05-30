@@ -1,4 +1,4 @@
-use super::fingerprint::{FingerPrint, EMPTY_FINGER_PRINT};
+use fingerprint::{FingerPrint, EMPTY_FINGER_PRINT};
 
 pub const ENTRIES_PER_BUCKET: usize = 4;
 

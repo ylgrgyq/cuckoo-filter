@@ -1,9 +1,7 @@
-use super::util::get_hash;
+use util::get_hash;
 
 use std::hash::{Hash, Hasher};
 use std::cmp::PartialEq;
-
-use siphasher::sip::SipHasher;
 
 pub const FINGERPRINT_SIZE: usize = 1;
 pub const EMPTY_FINGER_PRINT: FingerPrint = FingerPrint { fp: [0; FINGERPRINT_SIZE] };
@@ -49,9 +47,4 @@ impl PartialEq for FingerPrint {
         }
         true
     }
-}
-
-#[test]
-fn test_fp() {
-    FingerPrint::gen_finger_print(&String::from("sdfsdf"), &SipHasher::new());
 }

@@ -1,8 +1,10 @@
 [package]
 name = "rust-cuckoofilter"
 version = "0.1.0"
-authors = ["Rui Guo <rguo@leancloud.rocks>"]
+authors = ["ylgrgyq <alven.gr@gmail.com>"]
 
 [dependencies]
 rand = "0.3"
 siphasher = "^0.2.2"
+
+clippy = {version = "*", optional = true}
