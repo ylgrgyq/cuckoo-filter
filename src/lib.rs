@@ -20,7 +20,7 @@ use std::iter::repeat;
 use siphasher::sip::SipHasher;
 use rand::{Rng, ThreadRng};
 
-const BUCKETS_SIZE: usize = 100000;
+const BUCKETS_SIZE: usize = 1000000;
 const MAX_NUM_KICKS: u32 = 500;
 
 pub struct CuckooFilter {
@@ -33,17 +33,7 @@ pub struct CuckooFilter {
 
 impl CuckooFilter {
     pub fn new() -> CuckooFilter {
-        CuckooFilter {
-            hash_fn: CuckooFilter::sip_new(),
-            size: 0,
-            capacity: BUCKETS_SIZE as usize * ENTRIES_PER_BUCKET,
-            max_num_kicks: MAX_NUM_KICKS,
-            buckets:
-            repeat(Bucket::new())
-                .take(BUCKETS_SIZE as usize)
-                .collect::<Vec<_>>()
-                .into_boxed_slice()
-        }
+        CuckooFilter::with_bucket_size(BUCKETS_SIZE)
     }
 
     pub fn with_bucket_size(size: usize) -> CuckooFilter {
@@ -60,7 +50,7 @@ impl CuckooFilter {
         }
     }
 
-    pub fn insert<T>(&mut self, item: &T) -> Result<bool, &str>
+    pub fn insert<T>(&mut self, item: &T) -> Result<bool, &'static str>
         where T: Hash {
         let mut fp = FingerPrint::gen_finger_print(item, &self.hash_fn);
         let i1 = self.get_index(item);
@@ -161,6 +151,16 @@ impl CuckooFilter {
         SipHasher::new_with_keys(rand::Rand::rand(&mut rng),
                                  rand::Rand::rand(&mut rng))
     }
+}
+
+#[test]
+fn test_get_index() {
+    let f = CuckooFilter::new();
+    let test_str = &String::from("Hello");
+    let fp = FingerPrint::gen_finger_print(test_str, &f.hash_fn);
+    let i1 = f.get_index(test_str);
+    let i2 = f.get_alt_index(i1, &fp);
+    assert_eq!(i1, f.get_alt_index(i2, &fp));
 }
 
 #[test]
